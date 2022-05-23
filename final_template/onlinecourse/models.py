@@ -104,22 +104,21 @@ class Question(models.Model):
     # Foreign key to Course
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     # question text
-    textQuestion = models.TextField(null=False, blank=False)
+    question_text = models.CharField(max_length=200)
     # question grade/mark
-    grade = models.FloatField(null=False, blank=False, default=0.0)
+    grade = models.BigIntegerField(null=False, blank=False, default=0)
     # Other fields and methods you would like to design
     def __str__(self):
-        return "Course: {}, Question: {}, Grade: {}".format(self.course, self.textQuestion, self.grade) 
+        return "Course: {}, Question: {}, Grade: {}".format(self.course, self.question_text, self.grade) 
 
     # <HINT> A sample model method to calculate if learner get the score of the question
     def is_get_score(self, selected_ids):
-        all_answers = self.choice_set.filter(is_correct=True).count()
-        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
-        if all_answers == selected_correct:
+       all_answers = self.choice_set.filter(is_correct=True).count()
+       selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+       if all_answers == selected_correct:
             return True
-        else:
-            return False
-
+       else:
+           return False
 
 #  <HINT> Create a Choice Model with:
     # Used to persist choice content for a question
@@ -127,12 +126,12 @@ class Choice(models.Model):
     # One-To-Many (or Many-To-Many if you want to reuse choices) relationship with Question
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     # Choice content
-    textChoice = models.TextField(null=False, blank=False)
+    choice_text = models.CharField(max_length=220, null=False, blank=False)
     # Indicate if this choice of the question is a correct one or not
-    isCorrect = models.BooleanField(null=False, blank=False, default=False)
+    is_correct = models.BooleanField(null=False, blank=False, default=False)
     # Other fields and methods you would like to design
     def __str__(self):
-        return "Text: {}, it's right?: {}".format(self.textChoice, self.isCorrect)
+        return "Text: {}, it's right?: {}, Question: {}".format(self.choice_text, self.is_correct, self.question.question_text)
 
 # <HINT> The submission model
 # One enrollment could have multiple submission
@@ -140,5 +139,4 @@ class Choice(models.Model):
 # One choice could belong to multiple submissions
 class Submission(models.Model):
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-    chocies = models.ManyToManyField(Choice)
-#Other fields and methods you would like to design
+    choices = models.ManyToManyField(Choice)
